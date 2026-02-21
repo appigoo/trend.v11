@@ -26,15 +26,79 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- Telegram 通知函式 ---
-def send_telegram_msg(message):
+# --- Telegram 通知函式 (增加格式化) ---
+def send_telegram_msg(sym, action, reason, price, p_change, v_ratio):
     try:
         token = st.secrets["TELEGRAM_BOT_TOKEN"]
         chat_id = st.secrets["TELEGRAM_CHAT_ID"]
-        url = f"https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text={message}"
-        requests.get(url)
+        # 格式化訊息內容
+        message = (
+            f"🔔 【{action}預警】: {sym}\n"
+            f"現價: {price:.2f} ({p_change:+.2f}%)\n"
+            f"量比: {v_ratio:.1f}x\n"
+            f"--------------------\n"
+            f"📋 判定根據:\n{reason}"
+        )
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        params = {"chat_id": chat_id, "text": message}
+        requests.get(url, params=params)
     except Exception as e:
         print(f"Telegram 發送失敗: {e}")
+
+# --- 修改後的信號判定函數 ---
+def get_signal(df, p_limit, v_limit, sym):
+    if len(df) < 2: return "⏳", "#aaa", "數據不足", False
+    last, prev = df.iloc[-1], df.iloc[-2]
+    
+    price = float(last['Close'])
+    ema20, ema60, ema200 = float(last['EMA20']), float(last['EMA60']), float(last['EMA200'])
+    
+    # 1. 趨勢判定根據
+    is_bullish = price > ema200 and ema20 > ema60
+    is_bearish = price < ema200 and ema20 < ema60
+    
+    # 2. 異動計算
+    p_change = ((price - float(prev['Close'])) / float(prev['Close'])) * 100
+    v_ratio = float(last['Volume']) / float(last['Vol_Avg']) if last['Vol_Avg'] > 0 else 1
+    
+    # 3. 定義觸發條件與理由
+    trigger_alert = False
+    action_type = ""
+    reasons = []
+    
+    if is_bullish and p_change >= p_limit and v_ratio >= v_limit:
+        trigger_alert = True
+        action_type = "🚀 強勢做多"
+        reasons = [
+            f"✅ 價格 {price:.2f} > EMA200 ({ema200:.2f})",
+            f"✅ 均線多頭排佈 (EMA20 > EMA60)",
+            f"✅ 單根漲幅 {p_change:.2f}% 達標",
+            f"✅ 成交量放大 {v_ratio:.1f} 倍"
+        ]
+    elif is_bearish and p_change <= -p_limit and v_ratio >= v_limit:
+        trigger_alert = True
+        action_type = "🔻 強勢做空"
+        reasons = [
+            f"❌ 價格 {price:.2f} < EMA200 ({ema200:.2f})",
+            f"❌ 均線空頭排佈 (EMA20 < EMA60)",
+            f"❌ 單根跌幅 {p_change:.2f}% 達標",
+            f"❌ 成交量放大 {v_ratio:.1f} 倍"
+        ]
+
+    # 4. 發送通知
+    if trigger_alert:
+        reason_text = "\n".join(reasons)
+        send_telegram_msg(sym, action_type, reason_text, price, p_change, v_ratio)
+        
+    # UI 顯示邏輯
+    status, color = (action_type if action_type else "🚀 做多", "#00ff00") if is_bullish else \
+                    (action_type if action_type else "🔻 做空", "#ff4b4b") if is_bearish else ("⚖️ 觀望", "#aaa")
+    
+    alerts = []
+    if abs(p_change) >= p_limit: alerts.append(f"⚠️ 價異: {p_change:+.2f}%")
+    if v_ratio >= v_limit: alerts.append(f"🔥 量爆: {v_ratio:.1f}x")
+    
+    return status, color, "<br>".join(alerts) if alerts else "無異常", trigger_alert
 
 # --- 側邊欄 --- (保持原有邏輯並包含之前的 Period/Interval)
 with st.sidebar:

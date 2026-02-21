@@ -13,7 +13,7 @@ st.set_page_config(page_title="專業日內交易員系統 (Cloud版)", layout="
 # --- 側邊欄參數 ---
 with st.sidebar:
     st.header("⚙️ 交易參數")
-    symbol = st.text_input("股票代碼 (例如: AAPL, NVDA, TSLA, ^IXIC)", value="AAPL").upper()
+    symbol = st.text_input("股票代碼 (例如: AAPL, NVDA, TSLA, ^IXIC)", value="TSLA,TSLL,XPEV,NIO").upper()
     refresh_rate = st.slider("自動刷新頻率 (秒)", 60, 600, 300)
     st.divider()
     st.info("💡 提示：本版本已優化，支援 Streamlit Cloud 直接部署。")
@@ -76,7 +76,7 @@ def generate_signal(df):
     return status, action, strategy, color, vol_spike
 
 # --- UI 渲染主體 ---
-st.title("🕯️ 5分鐘 K線趨勢系統 (Lite)")
+st.title("🚨 5分鐘 K線趨勢系統 (Lite)")
 
 placeholder = st.empty()
 

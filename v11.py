@@ -28,7 +28,7 @@ with st.sidebar:
 def fetch_and_analyze(symbol):
     try:
         # 抓取數據 (5天內的 5分鐘線)
-        df = yf.download(symbol, period="5d", interval="5m", progress=False, prepost=False)
+        df = yf.download(symbol, period="2d", interval="5m", progress=False)
         if df.empty or len(df) < 30:
             return None
 

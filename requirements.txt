@@ -3,4 +3,4 @@ yfinance ==0.2.66
 pandas
 plotly
 numpy
-pandas_ta
+pandas-ta>=0.3.14

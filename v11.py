@@ -109,7 +109,7 @@ def get_signal(df, p_limit, v_limit, sym):
 # --- 5. 側邊欄 ---
 with st.sidebar:
     st.header("⚙️ 交易員參數")
-    input_syms = st.text_input("監控代碼", value="NVDA, TSLA, AAPL").upper()
+    input_syms = st.text_input("監控代碼", value="TSLA, NIO, TSLL, XPEV, META, GOOGL, AAPL, NVDA, AMZN, MSFT, TSM").upper()
     symbols = [s.strip() for s in input_syms.split(",") if s.strip()]
     sel_p = st.selectbox("數據範圍", ["1d", "5d", "1mo"], index=1)
     sel_i = st.selectbox("K線週期", ["1m", "5m", "15m", "1h"], index=1)

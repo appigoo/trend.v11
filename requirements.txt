@@ -1,5 +1,7 @@
-streamlit
-yfinance ==0.2.66
-pandas
-numpy
-pandas-ta
+# requirements.txt
+
+streamlit>=1.30.0          # Streamlit 主框架（建議較新版支援 session_state 與 cache_data 更好）
+yfinance>=0.2.40           # Yahoo Finance 資料抓取
+pandas>=2.0.0              # 資料處理
+pandas_ta>=0.3.14b0        # 技術指標計算（注意：有些版本欄位名稱可能有差異）
+plotly>=5.15.0             # 互動式圖表

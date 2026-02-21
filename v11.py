@@ -117,19 +117,39 @@ while True:
         
         st.divider()
 
+        # --- 在詳細圖表區 (Tabs) 的部分進行修改 ---
         if all_data:
-            st.subheader("📊 詳細技術分析")
+            st.subheader("📊 詳細技術分析 (近 30 根 K 線)")
             tabs = st.tabs(list(all_data.keys()))
             for i, (sym, df) in enumerate(all_data.items()):
                 with tabs[i]:
+                    # --- 核心改動：建立一個僅包含最後 30 根數據的副本用於繪圖 ---
+                    plot_df = df.tail(30).copy() 
+                    
                     fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
                                        vertical_spacing=0.05, row_heights=[0.7, 0.3])
-                    fig.add_trace(go.Candlestick(x=df.index, open=df['Open'], high=df['High'], 
-                                               low=df['Low'], close=df['Close'], name=sym), row=1, col=1)
-                    fig.add_trace(go.Scatter(x=df.index, y=df['EMA20'], name='EMA20', line=dict(color='yellow')), row=1, col=1)
-                    fig.add_trace(go.Scatter(x=df.index, y=df['EMA200'], name='EMA200', line=dict(color='red')), row=1, col=1)
-                    fig.add_trace(go.Bar(x=df.index, y=df['Hist'], name="MACD Hist"), row=2, col=1)
-                    fig.update_layout(height=600, template="plotly_dark", xaxis_rangeslider_visible=False)
+                    
+                    # K線 (使用 plot_df)
+                    fig.add_trace(go.Candlestick(
+                        x=plot_df.index, 
+                        open=plot_df['Open'], high=plot_df['High'], 
+                        low=plot_df['Low'], close=plot_df['Close'], 
+                        name=sym), row=1, col=1)
+                    
+                    # 均線 (使用 plot_df)
+                    fig.add_trace(go.Scatter(x=plot_df.index, y=plot_df['EMA20'], name='EMA20', line=dict(color='yellow')), row=1, col=1)
+                    fig.add_trace(go.Scatter(x=plot_df.index, y=plot_df['EMA200'], name='EMA200', line=dict(color='red')), row=1, col=1)
+                    
+                    # MACD 柱狀圖 (使用 plot_df)
+                    fig.add_trace(go.Bar(x=plot_df.index, y=plot_df['Hist'], name="MACD Hist"), row=2, col=1)
+                    
+                    # 移除範圍滑動條並美化佈局
+                    fig.update_layout(
+                        height=600, 
+                        template="plotly_dark", 
+                        xaxis_rangeslider_visible=False,
+                        margin=dict(l=10, r=10, t=30, b=10)
+                    )
                     st.plotly_chart(fig, use_container_width=True, key=f"chart_{sym}")
 
         st.caption(f"📅 最後更新: {datetime.now().strftime('%H:%M:%S')} | 週期: {selected_interval}")

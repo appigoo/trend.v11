@@ -123,7 +123,7 @@ def get_signal(df, p_limit, v_limit, sym):
 # --- 5. 側邊欄配置 ---
 with st.sidebar:
     st.header("⚙️ 參數設定")
-    input_symbols = st.text_input("股票代碼 (逗號分隔)", value="AAPL, NVDA, TSLA, BTC-USD").upper()
+    input_symbols = st.text_input("股票代碼 (逗號分隔)", value="TSLA, NIO, TSLL, XPEV, META, GOOGL, AAPL, NVDA, AMZN, MSFT, TSM, BTC-USD").upper()
     symbols = [s.strip() for s in input_symbols.split(",") if s.strip()]
     
     c1, c2 = st.columns(2)

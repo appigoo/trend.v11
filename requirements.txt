@@ -3,4 +3,4 @@ yfinance ==0.2.66
 pandas
 plotly
 numpy
-pandas-ta>=0.3.14b0
+pandas-ta @ git+https://github.com/twopirllc/pandas-ta.git@development

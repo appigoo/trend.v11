@@ -131,7 +131,7 @@ def get_signal(df, p_limit, v_limit, sym):
 # --- 6. 側邊欄 ---
 with st.sidebar:
     st.header("⚙️ 實戰參數")
-    input_symbols = st.text_input("代碼 (如: TSLA, NIO, TSLL, XPEV, META, GOOGL, AAPL, NVDA, AMZN, MSFT, TSM, BTC-USD)", value="NVDA, TSLA, AAPL").upper()
+    input_symbols = st.text_input("代碼 (如: TSLA, NIO, TSLL, XPEV, META, GOOGL, AAPL, NVDA, AMZN, MSFT, TSM, BTC-USD)", value="TSLA, NIO, TSLL, XPEV, META, GOOGL, AAPL, NVDA, AMZN, MSFT, TSM, BTC-USD").upper()
     symbols = [s.strip() for s in input_symbols.split(",") if s.strip()]
     
     c1, c2 = st.columns(2)
